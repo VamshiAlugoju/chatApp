@@ -1,0 +1,33 @@
+.chat_item {
+  width: 80%;
+  height: 55px;
+  display: flex;
+  padding: 1rem 0.5rem;
+  border-radius: 5px;
+  transition: ease-in-out 0.3s;
+  cursor: pointer;
+}
+
+.chat_item:hover {
+  background-color: rgba(179, 179, 179, 0.24);
+}
+
+.chatItem_info p {
+  margin: 0 10px 0;
+}
+
+.chatItem_name {
+  font-size: large;
+  font-weight: 700;
+  text-transform: capitalize;
+}
+
+.chatItem_lasatMsg {
+  font-size: small;
+  color: rgb(182, 182, 182);
+  font-weight: 700;
+}
+
+.selected {
+  background-color: aliceblue;
+}
