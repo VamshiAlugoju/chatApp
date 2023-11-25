@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import * as React from "react";
+import React from "react";
 import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -13,6 +13,10 @@ import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
+import axios from "axios";
+import { localUrl } from "../../helper/Baseurls";
+// import dotenv from "dotenv";
+// // dotenv.config();
 
 type SignUpProps = {
   toggleToLogin: () => void;
@@ -39,14 +43,28 @@ function Copyright(props: any) {
 const defaultTheme = createTheme();
 
 export default function SignUp(props: SignUpProps) {
-  console.log(props);
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const [name, setName] = React.useState("");
+  const [email, setEmail] = React.useState("");
+  const [password, setPassword] = React.useState("");
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get("email"),
-      password: data.get("password"),
-    });
+
+    const url = localUrl;
+    try {
+      const result = await axios.post(url + "/user/signUp", {
+        name,
+        email,
+        password,
+      });
+      if (result && result.status) {
+        props.toggleToLogin();
+      } else {
+        alert(result.data.message);
+      }
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   return (
@@ -61,7 +79,7 @@ export default function SignUp(props: SignUpProps) {
             alignItems: "center",
           }}
         >
-          <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
+          <Avatar sx={{ m: 1, bgcolor: "#4897bd" }}>
             <LockOutlinedIcon />
           </Avatar>
           <Typography component="h1" variant="h5">
@@ -83,6 +101,10 @@ export default function SignUp(props: SignUpProps) {
                   id="fullName"
                   label="Full Name"
                   autoFocus
+                  value={name}
+                  onChange={(e) => {
+                    setName(e.target.value);
+                  }}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -93,6 +115,10 @@ export default function SignUp(props: SignUpProps) {
                   label="Email Address"
                   name="email"
                   autoComplete="email"
+                  value={email}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                  }}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -104,6 +130,10 @@ export default function SignUp(props: SignUpProps) {
                   type="password"
                   id="password"
                   autoComplete="new-password"
+                  value={password}
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                  }}
                 />
               </Grid>
             </Grid>
@@ -111,7 +141,7 @@ export default function SignUp(props: SignUpProps) {
               type="submit"
               fullWidth
               variant="contained"
-              sx={{ mt: 3, mb: 2 }}
+              sx={{ mt: 3, mb: 2, bgcolor: "#4897bd" }}
             >
               Sign Up
             </Button>

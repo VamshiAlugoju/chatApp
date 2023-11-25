@@ -7,16 +7,14 @@ import Chat from "./pages/Chat/Chats";
 
 function App() {
   const [isLoggedIn, setisLoggedIn] = useState(false);
-  console.log(setisLoggedIn);
-  function fakeLogin() {
+  function loginUser() {
     setisLoggedIn(true);
   }
-  return (
-    <>
-      {!isLoggedIn && <button onClick={fakeLogin}>click to login</button>}
-      {isLoggedIn ? <Chat /> : <Auth />}
-    </>
-  );
+  // function logoutUser() {
+  //   setisLoggedIn(false);
+  // }
+
+  return <>{isLoggedIn ? <Chat /> : <Auth loginUser={loginUser} />}</>;
 }
 
 export default App;

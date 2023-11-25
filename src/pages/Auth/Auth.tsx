@@ -1,7 +1,11 @@
 import React from "react";
 import SignIn from "./Signin";
 import SignUp from "./Signup";
-export default function Auth() {
+
+type authProps = {
+  loginUser: () => void;
+};
+export default function Auth(props: authProps) {
   const [loginMode, setloginMode] = React.useState(true);
   function toggleToLogin() {
     setloginMode(true);
@@ -10,7 +14,7 @@ export default function Auth() {
     setloginMode(false);
   }
   return loginMode ? (
-    <SignIn toggleToSignUp={toggleToSignUp} />
+    <SignIn loginUser={props.loginUser} toggleToSignUp={toggleToSignUp} />
   ) : (
     <SignUp toggleToLogin={toggleToLogin} />
   );

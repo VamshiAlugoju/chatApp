@@ -1,0 +1,38 @@
+.all_user_modal {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  flex-direction: column;
+  overflow-y: scroll;
+  border-radius: 5px;
+}
+
+.people_item {
+  display: flex;
+  width: 90%;
+  padding: 0.8rem 0.5rem;
+  border-radius: 5px;
+  cursor: pointer;
+  justify-content: space-between;
+  /* transition: ease 0.2s; */
+  align-items: center;
+  margin-top: 5px;
+}
+.all_user_modal_header {
+  text-align: center;
+  font-weight: 700;
+}
+
+.people_item:hover {
+  /* background-color: rgba(195, 195, 195, 0.086); */
+  /* border: 1px solid rgba(150, 150, 150, 0.355);   */
+}
+.people_item_name_div {
+  width: 60%;
+}
+
+.people_item_name {
+  font-weight: 700;
+  font-size: 1.5rem;
+  margin: 0;
+}

@@ -5,6 +5,8 @@ import ChatItem from "../chatItem/ChatItem";
 import "./chatlist.css";
 import { ReactElement } from "react";
 import CloseIcon from "@mui/icons-material/Close";
+import AllUsersModal from "../models/AllUsersModal";
+import CreateGroupModal from "../models/CreateGroupModal";
 
 export default function () {
   const arr = [
@@ -22,6 +24,7 @@ export default function () {
   ];
   const [chats, setchats] = React.useState(arr);
   const [showSendOptions, setSendOptions] = React.useState(false);
+
   return (
     <>
       <div className="chatList">
@@ -53,6 +56,14 @@ export default function () {
 }
 
 function OptionsPanel(props: any): ReactElement {
+  const [allUserModal, setAllUserModal] = React.useState(false);
+  const [showCreateGroup, setShowCreateGroup] = React.useState(false);
+  function toggleCreateGroup() {
+    setShowCreateGroup((prev) => !prev);
+  }
+  function toggleAllUser() {
+    setAllUserModal((prev) => !prev);
+  }
   return (
     <>
       <div className="sendOptions">
@@ -67,10 +78,22 @@ function OptionsPanel(props: any): ReactElement {
         </div>
         <div className="sendOptionsVals">
           <ul>
-            <li>Create Group</li>
-            <li>Search People</li>
+            <li onClick={toggleCreateGroup}>Create Group</li>
+            <li onClick={toggleAllUser}>Search People</li>
           </ul>
         </div>
+        {allUserModal && (
+          <AllUsersModal
+            toggleAlluser={toggleAllUser}
+            allUserModal={allUserModal}
+          />
+        )}
+        {showCreateGroup && (
+          <CreateGroupModal
+            showCreateGroup={showCreateGroup}
+            toggleCreateGroup={toggleCreateGroup}
+          />
+        )}
       </div>
     </>
   );
