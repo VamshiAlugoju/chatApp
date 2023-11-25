@@ -3,9 +3,10 @@ const express = require("express");
 const connectDb = require("./utils/dbConfig");
 const bodyParser = require("body-parser");
 const userRoutes = require("./Routes/userRoutes");
+const cors = require("cors");
 const app = express();
 app.use(bodyParser({ extended: "application/json" }));
-
+app.use(cors({ origin: "*" }));
 const PORT = 8080;
 
 app.use("/api/user", userRoutes);

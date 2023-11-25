@@ -48,7 +48,7 @@ exports.signUp = signUp;
 async function signIn(req, res) {
   const { email, password } = req.body;
   const user = await userModel.find({ email });
-  if (user && user[0].email === email) {
+  if (user && user[0] && user[0].email === email) {
     bcrypt.compare(password, user[0].password, (err, result) => {
       if (err) {
         return res.status(500).json({ message: "internal server error" });
@@ -61,7 +61,22 @@ async function signIn(req, res) {
       }
     });
   } else {
-    res.status(404).json(new Error("user not found"));
+    res.status(404).json({ status: false, message: "user not found" });
   }
 }
 exports.signIn = signIn;
+
+async function getAllUsers(req, res) {
+  const user = { email: "vamshi@gmail.com" };
+  try {
+    const userList = await userModel.find({
+      email: { $nin: [user.email] },
+    });
+    res.status(200).json({ status: true, data: userList });
+    if (req.user && req.user.email) {
+    }
+  } catch (err) {
+    res.status(500).json({ status: false, message: "internal server error" });
+  }
+}
+exports.getAllUsers = getAllUsers;
