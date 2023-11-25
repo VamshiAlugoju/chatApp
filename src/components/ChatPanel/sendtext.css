@@ -1,0 +1,50 @@
+textarea:focus,
+input:focus {
+  outline: none;
+}
+.send_text {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 0 10px;
+  height: 100%;
+  justify-content: space-between;
+}
+.sendMessage_right_div {
+  width: 90%;
+  border: 1px solid rgb(196, 196, 196);
+  border-radius: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 80%;
+}
+
+.sendMessage_right_div input {
+  outline: none;
+  width: 90%;
+  border: none;
+  height: 90%;
+  border-radius: 20px;
+}
+
+.sendMessage_icon {
+  width: 10%;
+}
+
+.sendIcon_span {
+  color: blue;
+  width: 10%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.sendIcon_span:hover {
+}
+
+.sendMessage_icon {
+  display: flex;
+  justify-content: center;
+}

@@ -6,7 +6,7 @@ import Auth from "./pages/Auth/Auth";
 import Chat from "./pages/Chat/Chats";
 
 function App() {
-  const [isLoggedIn, setisLoggedIn] = useState(true);
+  const [isLoggedIn, setisLoggedIn] = useState(false);
   console.log(setisLoggedIn);
   function fakeLogin() {
     setisLoggedIn(true);

@@ -8,6 +8,7 @@
   font-weight: 700;
   border-bottom: 1px solid rgba(179, 179, 179, 0.322);
   padding: 0 1rem;
+  height: 10%;
 }
 .chatlist_top_div p {
   font-size: 1.4rem;
@@ -41,4 +42,47 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
+}
+
+.sendOptions {
+  background-color: white;
+  width: 150px;
+  /* height: 300px; */
+  position: absolute;
+  top: 25px;
+  left: 320px;
+  border: 1px solid #dddddd82;
+  border-radius: 5px;
+  padding: 0 0.5rem 0.5rem 0.5rem;
+}
+
+.sendOptions .button_div {
+  display: flex;
+  justify-content: flex-end;
+}
+.button_div button {
+  background-color: white;
+  color: rgb(146, 146, 146);
+}
+.sendOptionsVals {
+  display: flex;
+  justify-content: center;
+}
+
+.sendOptionsVals li {
+  list-style: none;
+  padding: 5px 0;
+  width: 100%;
+  cursor: pointer;
+  border-radius: 5px;
+  padding-left: 5px;
+  color: rgb(92, 92, 92);
+  transition: ease 0.2s;
+}
+.sendOptionsVals li:hover {
+  background-color: rgba(224, 224, 224, 0.445);
+}
+.sendOptionsVals ul {
+  padding: 0;
+  width: 100%;
 }

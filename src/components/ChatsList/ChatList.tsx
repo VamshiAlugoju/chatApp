@@ -1,7 +1,11 @@
+/* eslint-disable react-refresh/only-export-components */
 import React from "react";
 import AddIcon from "@mui/icons-material/Add";
 import ChatItem from "../chatItem/ChatItem";
 import "./chatlist.css";
+import { ReactElement } from "react";
+import CloseIcon from "@mui/icons-material/Close";
+
 export default function () {
   const arr = [
     {
@@ -17,14 +21,20 @@ export default function () {
     },
   ];
   const [chats, setchats] = React.useState(arr);
+  const [showSendOptions, setSendOptions] = React.useState(false);
   return (
     <>
       <div className="chatList">
         <div className="chatlist_top_div">
           <p>Messages</p>
-          <button>
+          <button
+            onClick={() => {
+              setSendOptions((prev) => !prev);
+            }}
+          >
             <AddIcon />
           </button>
+          {showSendOptions && <OptionsPanel setSendOptions={setSendOptions} />}
         </div>
         <div className="chatList_chats">
           {chats.map((item) => {
@@ -36,6 +46,30 @@ export default function () {
               />
             );
           })}
+        </div>
+      </div>
+    </>
+  );
+}
+
+function OptionsPanel(props: any): ReactElement {
+  return (
+    <>
+      <div className="sendOptions">
+        <div className="button_div">
+          <button
+            onClick={() => {
+              props.setSendOptions((prev: any) => !prev);
+            }}
+          >
+            <CloseIcon />
+          </button>
+        </div>
+        <div className="sendOptionsVals">
+          <ul>
+            <li>Create Group</li>
+            <li>Search People</li>
+          </ul>
         </div>
       </div>
     </>

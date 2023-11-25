@@ -1,4 +1,5 @@
 import { Avatar } from "@mui/material";
+import {} from "../../../src/helper/avatarColors";
 import "./chatItem.css";
 type chatItemProps = {
   Name: string;

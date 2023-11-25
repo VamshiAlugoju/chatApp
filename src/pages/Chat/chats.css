@@ -16,17 +16,16 @@
 }
 
 .nav_div {
-  width: 5%;
+  width: 6%;
   box-shadow: 3px 0px 3px rgba(167, 167, 167, 0.151);
-}
-.chatList_main {
-  width: 28%;
-  border-right: 1px solid rgba(179, 179, 179, 0.322);
-}
-.nav_div {
   display: flex;
   flex-direction: column;
 }
+.chatList_main {
+  width: 27%;
+  border-right: 1px solid rgba(179, 179, 179, 0.322);
+}
+
 .Nav_icon {
   text-align: center;
   padding-top: 1rem;
@@ -34,6 +33,5 @@
 }
 
 .main_chat_panel {
-  width: 100%;
-  border: 1px solid red;
+  width: 67%;
 }
