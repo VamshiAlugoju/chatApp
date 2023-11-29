@@ -1,3 +1,14 @@
 .create_group_div {
   border-radius: 5px;
 }
+.create_group_div form {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.create_group_header {
+  text-align: center;
+}
+
+.create_group_form_div {
+}

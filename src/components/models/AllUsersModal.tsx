@@ -1,5 +1,5 @@
 // import { Modal } from "flowbite-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 // import Modal from "react-modal";
 import Modal from "@mui/material/Modal";
 import { Avatar } from "@mui/material";
@@ -8,6 +8,10 @@ import Button from "@mui/material-next/Button";
 import "./alllusermodal.css";
 import "react-tooltip/dist/react-tooltip.css";
 import { Tooltip } from "react-tooltip";
+import axios from "axios";
+import { localUrl } from "../../helper/Baseurls";
+import { useSelector } from "react-redux/es/hooks/useSelector";
+import { useDispatch } from "react-redux";
 
 type allUserProps = {
   allUserModal: boolean;
@@ -29,10 +33,20 @@ const style = {
 };
 export default function AllUsersModal(props: allUserProps) {
   // const [users,setusers] = useState([])
-  const customStyles = {
-    width: "100px",
-    border: "white",
-  };
+
+  const [userList, setUserList] = useState([]);
+
+  useEffect(() => {
+    (async () => {
+      const url = localUrl + "/user/allUsers";
+      const token = localStorage.getItem("token");
+      const result = await axios.get(url, {
+        headers: { Authorization: token },
+      });
+      const data = result.data.data;
+      setUserList(data);
+    })();
+  }, []);
 
   return (
     <>
@@ -46,21 +60,45 @@ export default function AllUsersModal(props: allUserProps) {
           <div className="all_user_modal_header">
             <h2>AllUsers</h2>
           </div>
-          {PeopleItem()}
-          {PeopleItem()}
+          {userList.map((item: any) => {
+            return PeopleItem({
+              name: item.name,
+              src: item.src,
+              toggleAlluser: props.toggleAlluser,
+              id: item._id,
+            });
+          })}
         </div>
       </Modal>
     </>
   );
 }
 
-function PeopleItem() {
+type peopleItemProps = {
+  id?: string;
+  name?: string;
+  src?: string;
+  toggleAlluser?: () => void;
+};
+
+function PeopleItem(props: peopleItemProps) {
+  // const reciever = useSelector((state: any) => state.reciever);
+  const dispatch = useDispatch();
+
+  function setCurrentChat() {
+    dispatch({
+      type: "UPDATERECIEVER",
+      payload: { id: props.id, name: props.name, src: props.src },
+    });
+    props.toggleAlluser && props.toggleAlluser();
+  }
+
   return (
     <>
       <div className="people_item">
-        <Avatar />
+        <Avatar src={props.src} />
         <div className="people_item_name_div">
-          <p className="people_item_name">Name</p>
+          <p className="people_item_name">{props.name}</p>
         </div>
         <Button
           data-tooltip-id="my-tooltip"
@@ -69,6 +107,7 @@ function PeopleItem() {
           disabled={false}
           size="small"
           variant="filled"
+          onClick={setCurrentChat}
         >
           <SendIcon />
         </Button>

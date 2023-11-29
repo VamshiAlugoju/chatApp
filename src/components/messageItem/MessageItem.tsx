@@ -26,12 +26,11 @@ export default function Messageitem(props: messageItemProps) {
               className={`message_item_Name ${props.other ? "other" : "me"}`}
             >
               <p>.{props.other ? "Joseph" : "You"}</p>
-              <p className="message_time">18:79 pm</p>
+              <p className="message_time">props.time</p>
             </div>
             <div className={`message_value ${props.other ? "other" : "me"}`}>
               <div className={`message_text ${props.other ? "other" : "me"}`}>
-                this is a tes message so ;llkjfl fjlsdl l fllsl ll flsdjfwe;lof
-                ;f js;ofj wf; f; fieo fjldfl sfslllls
+                {props.message}
               </div>
             </div>
           </div>

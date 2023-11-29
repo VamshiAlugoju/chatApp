@@ -46,11 +46,10 @@ export default function SignIn(props: SignInProps) {
   const [password, setPassword] = React.useState("");
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    console.log("hello");
     event.preventDefault();
     // const data = new FormData(event.currentTarget);
     const url = localUrl;
-    console.log(import.meta.env);
+
     try {
       const result = await axios.post(url + "/user/signIn", {
         email,

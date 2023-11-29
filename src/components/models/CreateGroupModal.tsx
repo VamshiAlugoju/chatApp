@@ -1,7 +1,12 @@
 import "./creategroupmodal.css";
-import { useState } from "react";
 import Modal from "@mui/material/Modal";
 import { Avatar } from "@mui/material";
+import React, { useState } from "react";
+import { Button, InputLabel } from "@mui/material";
+import TextField from "@mui/material/TextField";
+import axios from "axios";
+import { localUrl } from "../../helper/Baseurls";
+import Header from "../../helper/constants";
 
 type createGroupProps = {
   showCreateGroup: boolean;
@@ -23,6 +28,29 @@ const style = {
 };
 
 export default function CreateGroupModal(props: createGroupProps) {
+  const [name, setName] = useState("");
+  const [about, setAbout] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleSubmit = async (e) => {
+    try {
+      setIsLoading(true);
+      e.preventDefault();
+      const url = localUrl + "/group/createGroup";
+      const data = {
+        gName: name,
+        about,
+      };
+      const headers = Header();
+      const result = await axios.post(url, data, headers);
+      alert("group Created");
+      setIsLoading(false);
+      props.toggleCreateGroup();
+    } catch (err) {
+      console.log(err);
+      setIsLoading(false);
+    }
+  };
   return (
     <>
       <Modal
@@ -31,7 +59,35 @@ export default function CreateGroupModal(props: createGroupProps) {
         aria-labelledby="child-modal-title"
         aria-describedby="child-modal-description"
       >
-        <div className="create_group_div" style={style}></div>
+        <div className="create_group_div" style={style}>
+          <form onSubmit={handleSubmit}>
+            <div className="create_group_form_div">
+              <div className="create_group_header">
+                <h1> Create Group</h1>
+              </div>
+              <InputLabel htmlFor="name">Name</InputLabel>
+              <TextField
+                id="name"
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                fullWidth
+              />
+              <InputLabel htmlFor="about">About</InputLabel>
+              <TextField
+                id="about"
+                type="text"
+                value={about}
+                onChange={(e) => setAbout(e.target.value)}
+                fullWidth
+              />
+
+              <Button variant="contained" type="submit">
+                Create
+              </Button>
+            </div>
+          </form>
+        </div>
       </Modal>
     </>
   );

@@ -3,7 +3,6 @@ import "./chats.css";
 import ChatList from "../../components/ChatsList/ChatList";
 import ChatPanel from "../../components/ChatPanel/ChatPanel";
 export default function Chat() {
-  console.log(styles.background);
   return (
     <>
       <div className="homePage">

@@ -7,8 +7,10 @@ type sendTextProps = {
   sendMessage: () => void;
 };
 export default function SendText(props: sendTextProps) {
-  function sendAction() {
-    props.sendMessage();
+  const [messageText, setMessageText] = React.useState("");
+  function sendAction(e) {
+    e.preventDefault();
+    props.sendMessage(messageText);
   }
 
   return (
@@ -19,7 +21,7 @@ export default function SendText(props: sendTextProps) {
         </div>
         <div className="sendMessage_right_div">
           {/* <textarea name="sendMessage" id="sendMessage"></textarea> */}
-          <input type="text" />
+          <input type="text" value={messageText} />
           <span onClick={sendAction} className="sendIcon_span">
             <SendIcon />
           </span>
