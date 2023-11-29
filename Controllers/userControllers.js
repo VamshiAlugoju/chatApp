@@ -67,16 +67,34 @@ async function signIn(req, res) {
 exports.signIn = signIn;
 
 async function getAllUsers(req, res) {
-  const user = { email: "vamshi@gmail.com" };
+  const user = req.user;
   try {
-    const userList = await userModel.find({
-      email: { $nin: [user.email] },
-    });
-    res.status(200).json({ status: true, data: userList });
     if (req.user && req.user.email) {
+      const userList = await userModel.find({
+        email: { $nin: [user.email] },
+      });
+      return res.json({ status: true, data: userList });
     }
   } catch (err) {
-    res.status(500).json({ status: false, message: "internal server error" });
+    return res
+      .status(500)
+      .json({ status: false, message: "internal server error" });
   }
 }
 exports.getAllUsers = getAllUsers;
+
+async function getUserDetails(req, res) {
+  const user = req.user;
+  try {
+    const userDetails = await userModel.findById(
+      user._id,
+      "name profileDone email imgSrc"
+    );
+    res.status(200).json({ status: true, data: userDetails });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ status: false });
+  }
+}
+
+exports.getUserDetails = getUserDetails;

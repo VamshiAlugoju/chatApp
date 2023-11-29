@@ -5,8 +5,9 @@ const autherize = require("../utils/autherize");
 console.log("function is lf", autherize);
 Router.route("/signUp").post(userControllers.signUp);
 Router.route("/signIn").post(userControllers.signIn);
-// Router.route("/allUsers").get(autherize, userControllers.getAllUsers);
-Router.route("/allUsers").get(userControllers.getAllUsers);
+Router.route("/allUsers").get(autherize, userControllers.getAllUsers);
+Router.route("/getUserDetails").get(autherize, userControllers.getUserDetails);
+// Router.route("/allUsers").get(userControllers.getAllUsers);
 
 module.exports = Router;
 

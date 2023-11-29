@@ -2,10 +2,11 @@ const mongoose = require("mongoose");
 const schema = mongoose.Schema;
 
 const groupSchema = new schema({
-  creator: String,
+  creator: {},
   Admins: [],
   Name: String,
   createDate: Date,
+  members: [],
 });
 
 const groupModel = mongoose.model("group", groupSchema);

@@ -3,10 +3,11 @@ const schema = mongoose.Schema;
 
 const chatDetailSchema = new schema({
   isGroup: Boolean,
-  SName: String,
-  RName: String,
+  users: [],
   hasUnread: Boolean,
   groupId: schema.ObjectId,
+  lastMessaged: String,
+  latestMessage: String,
 });
 
 const chatDetailModel = mongoose.model("chatDetail", chatDetailSchema);
