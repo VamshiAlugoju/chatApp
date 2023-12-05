@@ -7,6 +7,8 @@ import TextField from "@mui/material/TextField";
 import axios from "axios";
 import { localUrl } from "../../helper/Baseurls";
 import Header from "../../helper/constants";
+import { UseSelector, useSelector } from "react-redux/es/hooks/useSelector";
+import { useDispatch } from "react-redux";
 
 type createGroupProps = {
   showCreateGroup: boolean;
@@ -28,6 +30,8 @@ const style = {
 };
 
 export default function CreateGroupModal(props: createGroupProps) {
+  const reciever = useSelector((state: any) => state.reciever);
+  const dispatch = useDispatch();
   const [name, setName] = useState("");
   const [about, setAbout] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -43,7 +47,20 @@ export default function CreateGroupModal(props: createGroupProps) {
       };
       const headers = Header();
       const result = await axios.post(url, data, headers);
-      alert("group Created");
+
+      dispatch({
+        type: "UPDATERECIEVER",
+        payload: { isGroup: true, group: result.data.Group },
+      });
+      const chatListItem = {
+        isGroup: true,
+        gname: name,
+        groupId: result.data.Group._id,
+      };
+      dispatch({
+        type: "UPDATEUSER",
+        payload: chatListItem,
+      });
       setIsLoading(false);
       props.toggleCreateGroup();
     } catch (err) {

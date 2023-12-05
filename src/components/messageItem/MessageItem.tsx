@@ -10,6 +10,7 @@ type messageItemProps = {
 };
 
 export default function Messageitem(props: messageItemProps) {
+  console.log("message", props);
   return (
     <>
       <div className={`message_item ${props.other ? "other" : "me"}`}>
@@ -26,7 +27,7 @@ export default function Messageitem(props: messageItemProps) {
               className={`message_item_Name ${props.other ? "other" : "me"}`}
             >
               <p>.{props.other ? "Joseph" : "You"}</p>
-              <p className="message_time">props.time</p>
+              <p className="message_time">{props.time}</p>
             </div>
             <div className={`message_value ${props.other ? "other" : "me"}`}>
               <div className={`message_text ${props.other ? "other" : "me"}`}>

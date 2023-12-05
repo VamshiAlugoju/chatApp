@@ -2,9 +2,11 @@ import { Avatar } from "@mui/material";
 import {} from "../../../src/helper/avatarColors";
 import "./chatItem.css";
 type chatItemProps = {
+  id: string;
   Name: string;
-  LastMsg: string;
-  src: string;
+  LastMsg?: string;
+  src?: string;
+  onClick: (userId: string) => void;
 };
 
 function stringToColor(string: string) {
@@ -37,7 +39,12 @@ export default function ChatItem(props: chatItemProps) {
     };
   }
   return (
-    <div className="chat_item">
+    <div
+      onClick={() => {
+        props.onClick(props.id);
+      }}
+      className="chat_item"
+    >
       <Avatar
         {...stringAvatar(props.Name)}
         alt={props.Name}
@@ -47,8 +54,8 @@ export default function ChatItem(props: chatItemProps) {
       <div className="chatItem_info">
         <p className="chatItem_name">{props.Name}</p>
         <p className="chatItem_lasatMsg">
-          {props.LastMsg.slice(0, 25)}
-          {props.LastMsg.length > 25 ? "..." : null}
+          {props.LastMsg?.slice(0, 25)}
+          {props?.LastMsg?.length && props.LastMsg.length > 25 ? "..." : null}
         </p>
       </div>
     </div>

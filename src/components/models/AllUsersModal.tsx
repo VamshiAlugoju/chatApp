@@ -88,7 +88,16 @@ function PeopleItem(props: peopleItemProps) {
   function setCurrentChat() {
     dispatch({
       type: "UPDATERECIEVER",
-      payload: { id: props.id, name: props.name, src: props.src },
+      payload: { _id: props.id, name: props.name, src: props.src },
+    });
+    const chatListItem = {
+      isGroup: false,
+      hasUnread: false,
+      users: [{ _id: props.id, name: props.name }],
+    };
+    dispatch({
+      type: "UPDATEUSER",
+      payload: chatListItem,
     });
     props.toggleAlluser && props.toggleAlluser();
   }

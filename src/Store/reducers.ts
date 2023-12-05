@@ -8,6 +8,15 @@ export function userReducer(state = userInitialState, action: any) {
       return {
         ...action.payload,
       };
+    case updateUser: {
+      let data = [action.payload];
+      data = [...data, ...state.chatList];
+      return {
+        ...state,
+        chatList: data,
+      };
+    }
+
     default:
       return state;
   }

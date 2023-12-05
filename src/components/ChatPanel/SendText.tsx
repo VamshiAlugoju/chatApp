@@ -4,7 +4,7 @@ import SendIcon from "@mui/icons-material/Send";
 import "./sendtext.css";
 
 type sendTextProps = {
-  sendMessage: () => void;
+  sendMessage: (message: string) => void;
 };
 export default function SendText(props: sendTextProps) {
   const [messageText, setMessageText] = React.useState("");
@@ -21,7 +21,13 @@ export default function SendText(props: sendTextProps) {
         </div>
         <div className="sendMessage_right_div">
           {/* <textarea name="sendMessage" id="sendMessage"></textarea> */}
-          <input type="text" value={messageText} />
+          <input
+            type="text"
+            onChange={(e) => {
+              setMessageText(e.target.value);
+            }}
+            value={messageText}
+          />
           <span onClick={sendAction} className="sendIcon_span">
             <SendIcon />
           </span>

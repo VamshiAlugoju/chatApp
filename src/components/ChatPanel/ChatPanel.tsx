@@ -15,6 +15,7 @@ type ChatPanelProps = {
 
 export default function ChatPanel(props: ChatPanelProps) {
   const receiver = useSelector((state: any) => state.receiver);
+  const user = useSelector((state: any) => state.user);
   const [showMessages, setShowMessages] = React.useState(true);
   const [showProfile, setshowProfile] = React.useState(false);
   const [showLoader, setShowLoader] = React.useState(false);
@@ -27,27 +28,34 @@ export default function ChatPanel(props: ChatPanelProps) {
     setshowProfile((prev) => !prev);
     setShowMessages((prev) => !prev);
   }
-  const [messagesData, setMessagesData] = React.useState([]);
   async function sendMessage(message) {
-    const data = {
+    const payload = {
       message: message,
-      time: Date.now(),
-      ...receiver,
+      time: Date.now().toLocaleString(),
+      rec: receiver,
+    };
+    const messageData = {
+      other: false,
+      content: message,
+      date: Date.now().toLocaleString(),
     };
     // send message ;
-    setMessagesData((prev) => {
-      setMessageData((prev) => {
-        return [...prev, message];
-      });
+    console.log("data", messageData);
+    const url = localUrl + "/chat/sendMessage";
+    const headers = Header();
+    let result = await axios.post(url, payload, headers);
+    setMessageData((prev) => {
+      return [...prev, messageData];
     });
   }
 
   useEffect(() => {
     (async () => {
+      console.log(receiver);
       if (Object.keys(receiver).length !== 0) {
         setIsChatSelected(true);
         setShowLoader(true);
-        // const data = await loadChats(receiver._id, receiver.name);
+        const data = await loadChats(receiver._id, receiver.name);
         setMessageData(data);
       }
     })();
@@ -69,12 +77,15 @@ export default function ChatPanel(props: ChatPanelProps) {
               <Avatar />
             </span>
             <div className="ch_nav_details">
-              <p className="ch_nav_name"> {receiver.name} </p>
+              <p className="ch_nav_name">
+                {" "}
+                {receiver.isGroup ? receiver.gname : receiver.name}{" "}
+              </p>
               <p className="  "> online</p>
             </div>
           </div>
         </div>
-        {showMessages && chatPanelChats(messagesData)}
+        {showMessages && chatPanelChats(messageData, user)}
         {showProfile && chatPanelProfile()}
         {showMessages && (
           <div className="chatPanel_send">
@@ -86,13 +97,26 @@ export default function ChatPanel(props: ChatPanelProps) {
   );
 }
 
-function chatPanelChats(messagesData: any) {
-  // const items = [true, false, true, true, false];
+function chatPanelChats(messagesData: any, user: any) {
   return (
     <div className="chatPanel_chat">
       <ScrollableFeed forceScroll={true}>
-        {messagesData.map((item: boolean) => {
-          return <Messageitem other={item} image="" />;
+        {messagesData.map((item: any, idx: any) => {
+          let isOther = true;
+          if (item?.sender?._id === user._id) {
+            isOther = false;
+          } else if (item.other !== undefined) {
+            console.log("itemsss", item);
+            isOther = item.other;
+          }
+          return (
+            <Messageitem
+              message={item.content}
+              other={isOther}
+              time={item.date}
+              image={item.image}
+            />
+          );
         })}
       </ScrollableFeed>
     </div>
@@ -104,7 +128,7 @@ function chatPanelProfile() {
 }
 
 async function loadChats(recId: string, recName: string) {
-  const url = localUrl + "/chats/getChat";
+  const url = localUrl + "/chat/getMessages";
   const payload = {
     recId,
     recName,
