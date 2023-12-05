@@ -6,10 +6,10 @@ const messageSchema = new schema({
   type: String,
   SStatus: String,
   RStatus: String,
-  time: Sting,
+  time: String,
   date: Date,
-  sender: String,
-  reciever: String,
+  sender: {},
+  reciever: {},
   belongsToGroup: Boolean,
   groupId: { type: schema.ObjectId },
 });

@@ -3,6 +3,7 @@ const connectDb = require("./utils/dbConfig");
 const bodyParser = require("body-parser");
 const userRoutes = require("./Routes/userRoutes");
 const groupRoutes = require("./Routes/groupRoutes");
+const chatRoutes = require("./Routes/chatRoutes");
 const cors = require("cors");
 const test = require("./Controllers/testController");
 const app = express();
@@ -12,6 +13,7 @@ const PORT = 8080;
 
 app.use("/api/user", userRoutes);
 app.use("/api/group", groupRoutes);
+app.use("/api/chat/", chatRoutes);
 
 app.use("/test", test.test);
 

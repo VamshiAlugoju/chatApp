@@ -5,7 +5,8 @@ const chatDetailSchema = new schema({
   isGroup: Boolean,
   users: [],
   hasUnread: Boolean,
-  groupId: schema.ObjectId,
+  groupId: schema.Types.ObjectId,
+  gname: String,
   lastMessaged: String,
   latestMessage: String,
 });

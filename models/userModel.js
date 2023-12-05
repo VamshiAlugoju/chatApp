@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const chatDetail = require("./chatdetailmodel");
 
 const userSchema = new mongoose.Schema({
   name: String,
@@ -7,7 +8,7 @@ const userSchema = new mongoose.Schema({
   imgSrc: String,
   createdDate: { type: Date },
   profileDone: { type: Boolean, default: false },
-  chatList: [{ type: mongoose.Schema.Types.ObjectId, ref: "chatDetail" }],
+  chatList: [],
 });
 
 const userModel = mongoose.model("userDetails", userSchema);

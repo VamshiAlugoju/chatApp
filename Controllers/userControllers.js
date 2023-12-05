@@ -86,10 +86,9 @@ exports.getAllUsers = getAllUsers;
 async function getUserDetails(req, res) {
   const user = req.user;
   try {
-    const userDetails = await userModel.findById(
-      user._id,
-      "name profileDone email imgSrc"
-    );
+    const userDetails = await userModel
+      .findById(user._id, "name profileDone email imgSrc")
+      .populate("chatList");
     res.status(200).json({ status: true, data: userDetails });
   } catch (err) {
     console.log(err);
