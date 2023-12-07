@@ -10,8 +10,11 @@ function test(req, res) {
     about: "something",
   };
   req.body = data;
+  req.params = {
+    id: "6571efb51f6bc78127ceb076",
+  };
   try {
-    userControllers.getUserDetails(req, res);
+    groupControllers.getGroupDetails(req, res);
   } catch (err) {
     console.log(err);
     res.send({ message: "error" });

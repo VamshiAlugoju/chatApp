@@ -98,6 +98,10 @@ async function getMessages(req, res) {
   try {
     const user = req.user;
     const payload = req.body;
+    if (payload.isGroup === true) {
+      const groupMessage = await getGroupMessages(user, payload);
+      return res.status(200).json({ status: true, data: groupMessage });
+    }
     const messageData = await messageModal
       .find({
         $or: [
@@ -128,7 +132,7 @@ async function sendMessageToGroup(user, chatList, payload) {
   };
 
   const chat = user?.chatList?.find((chat) => {
-    return chat.groupId === payload.rec._id;
+    return chat._id === payload.rec._id;
   });
   try {
     if (chat) {
@@ -156,4 +160,12 @@ async function sendMessageToGroup(user, chatList, payload) {
   } catch (err) {
     return Promise.reject(err);
   }
+}
+
+async function getGroupMessages(user, payload) {
+  const messages = await messageModal
+    .find({ groupId: payload.recId, belongsToGroup: true })
+    .sort({ date: 1 });
+  return Promise.resolve(messages);
+  return Promise.resolve(messages);
 }
