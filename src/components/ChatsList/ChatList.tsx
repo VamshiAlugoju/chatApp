@@ -46,7 +46,7 @@ export default function ChatList() {
   function selectUser(userId) {
     const chat = chats.find((chat) => {
       if (chat.isGroup) {
-        return chat.groupId === userId;
+        return chat._id === userId;
       }
       return chat._id === userId;
     });
@@ -81,9 +81,7 @@ export default function ChatList() {
                 />
               );
             }
-            {
-              console.log(chats, "click me");
-            }
+
             return (
               <ChatItem
                 id={item._id}

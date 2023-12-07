@@ -49,6 +49,17 @@
 .chatPanel_nav {
   display: flex;
   align-items: center;
+  justify-content: space-between;
+}
+
+.AddPeopleToGroup {
+  margin-right: 2rem;
+  border: none;
+  border-radius: 10px;
+  background: none;
+  cursor: pointer;
+}
+.AddPeopleToGroup button {
 }
 
 ::-webkit-scrollbar {

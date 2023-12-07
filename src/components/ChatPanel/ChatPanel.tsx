@@ -9,6 +9,10 @@ import { recieverReducer } from "../../Store/reducers";
 import { localUrl } from "../../helper/Baseurls";
 import Header from "../../helper/constants";
 import axios from "axios";
+import AddIcon from "@mui/icons-material/Add";
+import { Tooltip } from "react-tooltip";
+
+import AddPeopleModal from "../models/AddPeopleModal";
 type ChatPanelProps = {
   chatId?: string;
 };
@@ -19,11 +23,17 @@ export default function ChatPanel(props: ChatPanelProps) {
   const [showMessages, setShowMessages] = React.useState(true);
   const [showProfile, setshowProfile] = React.useState(false);
   const [showLoader, setShowLoader] = React.useState(false);
+  const [showAddPeople, setShowAddPeople] = React.useState(false);
   const [messageData, setMessageData] = React.useState<any>([]);
+  const [groupDetails, setGroupDetails] = React.useState<any>(null);
   const [isChatSelected, setIsChatSelected] = React.useState(() => {
     if (Object.keys(receiver).length === 0) return false;
     return true;
   });
+  const isAdmin = groupDetails?.Admins.find((item: any) => {
+    return item._id === user._id;
+  });
+  console.log("Adimin", isAdmin);
   function toggleProfile() {
     setshowProfile((prev) => !prev);
     setShowMessages((prev) => !prev);
@@ -40,7 +50,7 @@ export default function ChatPanel(props: ChatPanelProps) {
       date: Date.now().toLocaleString(),
     };
     // send message ;
-    console.log("data", messageData);
+
     const url = localUrl + "/chat/sendMessage";
     const headers = Header();
     let result = await axios.post(url, payload, headers);
@@ -55,7 +65,17 @@ export default function ChatPanel(props: ChatPanelProps) {
       if (Object.keys(receiver).length !== 0) {
         setIsChatSelected(true);
         setShowLoader(true);
-        const data = await loadChats(receiver._id, receiver.name);
+        const data = await loadChats(
+          receiver._id,
+          receiver.name,
+          receiver.isGroup
+        );
+        if (receiver.isGroup && receiver.isGroup === true) {
+          const groupData = await getGroupDetails(receiver.groupId);
+          setGroupDetails(groupData);
+        } else {
+          setGroupDetails(null);
+        }
         setMessageData(data);
       }
     })();
@@ -68,6 +88,7 @@ export default function ChatPanel(props: ChatPanelProps) {
       </div>
     );
   }
+  console.log("groupDetails", groupDetails);
   return (
     <>
       <div className="chatPanel">
@@ -84,6 +105,21 @@ export default function ChatPanel(props: ChatPanelProps) {
               <p className="  "> online</p>
             </div>
           </div>
+          {groupDetails && isAdmin && (
+            <div className="className">
+              <button
+                data-tooltip-id="addPeople"
+                data-tooltip-content="Add People To Group"
+                className="AddPeopleToGroup"
+                onClick={() => {
+                  setShowAddPeople((prev) => !prev);
+                }}
+              >
+                <AddIcon />
+              </button>
+              <Tooltip id="addPeople" />
+            </div>
+          )}
         </div>
         {showMessages && chatPanelChats(messageData, user)}
         {showProfile && chatPanelProfile()}
@@ -91,6 +127,13 @@ export default function ChatPanel(props: ChatPanelProps) {
           <div className="chatPanel_send">
             <SendText sendMessage={sendMessage} />
           </div>
+        )}
+        {showAddPeople && receiver.isGroup && (
+          <AddPeopleModal
+            setShowAddPeople={setShowAddPeople}
+            showAddPeople={showAddPeople}
+            groupId={receiver.groupId}
+          />
         )}
       </div>
     </>
@@ -127,13 +170,23 @@ function chatPanelProfile() {
   return <div className="chatPanel_chat"></div>;
 }
 
-async function loadChats(recId: string, recName: string) {
+async function loadChats(recId: string, recName: string, isGroup: any) {
   const url = localUrl + "/chat/getMessages";
-  const payload = {
+  const payload: any = {
     recId,
     recName,
   };
+  if (isGroup === true) {
+    payload.isGroup = true;
+  }
   const headers = Header();
   const result = await axios.post(url, payload, headers);
+  return result.data.data;
+}
+
+async function getGroupDetails(groupId: any) {
+  const url = localUrl + "/group/getGroupDetails/" + groupId;
+  const headers = Header();
+  const result = await axios.get(url, headers);
   return result.data.data;
 }
