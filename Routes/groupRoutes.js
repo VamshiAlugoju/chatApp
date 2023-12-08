@@ -10,6 +10,8 @@ Router.route("/getGroupDetails/:id").get(
   autherize,
   groupControllers.getGroupDetails
 );
+Router.route("/addAdmin").post(autherize, groupControllers.addAdmins);
+Router.route("/removeUsers").post(autherize, groupControllers.removeUsers);
 
 // Router.route("/createGroup").post
 
