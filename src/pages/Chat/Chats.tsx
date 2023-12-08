@@ -2,7 +2,13 @@ import styles from "./chats.module.css";
 import "./chats.css";
 import ChatList from "../../components/ChatsList/ChatList";
 import ChatPanel from "../../components/ChatPanel/ChatPanel";
-export default function Chat() {
+import ExitToAppIcon from "@mui/icons-material/ExitToApp";
+import { Tooltip } from "react-tooltip";
+
+type ChatProps = {
+  logOutUser: () => void;
+};
+export default function Chat(props: ChatProps) {
   return (
     <>
       <div className="homePage">
@@ -25,6 +31,20 @@ export default function Chat() {
                   </g>
                 </g>
               </svg>
+            </div>
+            <div
+              className="logOut_div"
+              style={{ textAlign: "center", marginTop: "1rem" }}
+              onClick={props.logOutUser}
+            >
+              <span>
+                <ExitToAppIcon
+                  data-tooltip-id="logout_tooltip"
+                  data-tooltip-content="Logout"
+                  sx={{ color: "#e91e63", fontSize: 40 }}
+                />
+              </span>
+              <Tooltip id="logout_tooltip" />
             </div>
           </div>
           <div className="chatList_main">

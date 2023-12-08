@@ -9,23 +9,46 @@ import { localUrl } from "./helper/Baseurls";
 import Header from "./helper/constants";
 import { useSelector } from "react-redux/es/hooks/useSelector";
 import { useDispatch } from "react-redux";
+import { assert } from "console";
 function App() {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user);
-  const [isLoggedIn, setisLoggedIn] = useState(false);
+  let loggedin = false;
+  const token = localStorage.getItem("token");
+  if (token !== undefined && token !== null) {
+    loggedin = true;
+  }
+  const [isLoggedIn, setisLoggedIn] = useState(loggedin);
   async function loginUser() {
     setisLoggedIn(true);
-    const url = localUrl + "/user/getUserDetails";
-    const headers = Header();
-    const result = await axios.get(url, headers);
-    const data = result.data.data;
-    dispatch({ type: "ADDUSER", payload: data });
   }
-  // function logoutUser() {
-  //   setisLoggedIn(false);
-  // }
 
-  return <>{isLoggedIn ? <Chat /> : <Auth loginUser={loginUser} />}</>;
+  async function logOutUser() {
+    localStorage.removeItem("token");
+    setisLoggedIn(false);
+  }
+
+  useEffect(() => {
+    (async () => {
+      if (isLoggedIn) {
+        const url = localUrl + "/user/getUserDetails";
+        const headers = Header();
+        const result = await axios.get(url, headers);
+        const data = result.data.data;
+        dispatch({ type: "ADDUSER", payload: data });
+      }
+    })();
+  }, [isLoggedIn]);
+
+  return (
+    <>
+      {isLoggedIn ? (
+        <Chat logOutUser={logOutUser} />
+      ) : (
+        <Auth loginUser={loginUser} />
+      )}
+    </>
+  );
 }
 
 export default App;
