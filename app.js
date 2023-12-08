@@ -11,6 +11,8 @@ app.use(bodyParser({ extended: "application/json" }));
 app.use(cors({ origin: "*" }));
 const PORT = 8080;
 
+console.log("ehllo")
+
 app.use("/api/user", userRoutes);
 app.use("/api/group", groupRoutes);
 app.use("/api/chat/", chatRoutes);
