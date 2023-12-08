@@ -9,7 +9,7 @@ import { localUrl } from "./helper/Baseurls";
 import Header from "./helper/constants";
 import { useSelector } from "react-redux/es/hooks/useSelector";
 import { useDispatch } from "react-redux";
-import { assert } from "console";
+
 function App() {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user);
@@ -19,6 +19,8 @@ function App() {
     loggedin = true;
   }
   const [isLoggedIn, setisLoggedIn] = useState(loggedin);
+  const [loading , setLoading] = useState(true);
+  const [userdata,setUserdata] = useState(null);
   async function loginUser() {
     setisLoggedIn(true);
   }
@@ -36,19 +38,31 @@ function App() {
         const result = await axios.get(url, headers);
         const data = result.data.data;
         dispatch({ type: "ADDUSER", payload: data });
+        setLoading(false)
+        setUserdata(data)
       }
     })();
   }, [isLoggedIn]);
-
-  return (
-    <>
-      {isLoggedIn ? (
-        <Chat logOutUser={logOutUser} />
-      ) : (
-        <Auth loginUser={loginUser} />
-      )}
-    </>
-  );
+  
+  if(userdata !== null){
+    return (
+      <>
+        {/* {isLoggedIn && loading  &&(
+          <div>loading</div>
+          ) }
+        {isLoggedIn && !loading &&  <Chat logOutUser={logOutUser} />} */}
+        {isLoggedIn  &&  <Chat logOutUser={logOutUser} />}
+  
+         {!isLoggedIn &&<Auth loginUser={loginUser} />}
+        
+      </>
+    );
+  }
+  else {
+   return (<>
+   {!isLoggedIn && <Auth loginUser={loginUser} />}
+   </>)
+  }
 }
 
 export default App;

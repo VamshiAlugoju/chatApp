@@ -11,12 +11,14 @@ import Header from "../../helper/constants";
 import axios from "axios";
 import AddIcon from "@mui/icons-material/Add";
 import { Tooltip } from "react-tooltip";
+import io from "socket.io-client";
 
 import AddPeopleModal from "../models/AddPeopleModal";
 type ChatPanelProps = {
   chatId?: string;
 };
 
+let socket ;
 export default function ChatPanel(props: ChatPanelProps) {
   const receiver = useSelector((state: any) => state.receiver);
   const user = useSelector((state: any) => state.user);
@@ -33,7 +35,6 @@ export default function ChatPanel(props: ChatPanelProps) {
   const isAdmin = groupDetails?.Admins.find((item: any) => {
     return item._id === user._id;
   });
-  console.log("Adimin", isAdmin);
   function toggleProfile() {
     setshowProfile((prev) => !prev);
     setShowMessages((prev) => !prev);
@@ -57,11 +58,12 @@ export default function ChatPanel(props: ChatPanelProps) {
     setMessageData((prev) => {
       return [...prev, messageData];
     });
+    socket.emit("send message",{...messageData,other:true ,id:receiver._id});
   }
 
   useEffect(() => {
     (async () => {
-      console.log(receiver);
+
       if (Object.keys(receiver).length !== 0) {
         setIsChatSelected(true);
         setShowLoader(true);
@@ -76,10 +78,28 @@ export default function ChatPanel(props: ChatPanelProps) {
         } else {
           setGroupDetails(null);
         }
+        socket.emit("join room",receiver._id);
         setMessageData(data);
+
       }
     })();
   }, [receiver]);
+
+  useEffect(()=>{
+    socket = io.connect("http://localhost:8080");
+    socket.emit("setup",user)
+    socket.on("connected",()=>{
+        console.log("connected");
+    })
+    socket.on("recieve message",(data)=>{
+        
+          setMessageData((prev) => {
+            return [...prev, data];
+          });
+    })
+
+},[])
+
 
   if (!isChatSelected) {
     return (
@@ -88,7 +108,6 @@ export default function ChatPanel(props: ChatPanelProps) {
       </div>
     );
   }
-  console.log("groupDetails", groupDetails);
   return (
     <>
       <div className="chatPanel">
@@ -143,13 +162,15 @@ export default function ChatPanel(props: ChatPanelProps) {
 function chatPanelChats(messagesData: any, user: any) {
   return (
     <div className="chatPanel_chat">
-      <ScrollableFeed forceScroll={true}>
+      <div style={{height:"100%"}}>
+
+      <ScrollableFeed forceScroll={true}  >
         {messagesData.map((item: any, idx: any) => {
           let isOther = true;
           if (item?.sender?._id === user._id) {
             isOther = false;
           } else if (item.other !== undefined) {
-            console.log("itemsss", item);
+          
             isOther = item.other;
           }
           return (
@@ -158,16 +179,18 @@ function chatPanelChats(messagesData: any, user: any) {
               other={isOther}
               time={item.date}
               image={item.image}
+              Name={item?.sender?.name}
             />
           );
         })}
       </ScrollableFeed>
+      </div>
     </div>
   );
 }
 
 function chatPanelProfile() {
-  return <div className="chatPanel_chat"></div>;
+  return <div  className="chatPanel_chat"></div>;
 }
 
 async function loadChats(recId: string, recName: string, isGroup: any) {

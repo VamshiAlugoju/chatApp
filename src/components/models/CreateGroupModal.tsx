@@ -64,7 +64,6 @@ export default function CreateGroupModal(props: createGroupProps) {
       setIsLoading(false);
       props.toggleCreateGroup();
     } catch (err) {
-      console.log(err);
       setIsLoading(false);
     }
   };

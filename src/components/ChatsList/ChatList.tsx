@@ -19,14 +19,17 @@ export default function ChatList() {
       data = item.users.find((it) => {
         return it.name !== user.name;
       });
+    }else {
+      data = item
     }
     return data;
   });
+  
   const [chats, setchats] = React.useState(arr);
   const [showSendOptions, setSendOptions] = React.useState(false);
 
   useEffect(() => {
-    console.log("count", user.chatList);
+
     const updatedChatsData = user?.chatList?.map((item) => {
       let data;
       if (item.isGroup) {
@@ -43,6 +46,17 @@ export default function ChatList() {
     setchats(updatedChatsData);
   }, [user.chatList]);
 
+  // useEffect(()=>{
+  //   socket = io("http://localhost:8080",{
+  //     reconnection: true,           // Enable reconnection
+  //     reconnectionAttempts: 3, 
+  //   });
+  //   return () => {
+  //     // Clean up the socket connection when the component is unmounted
+  //     socket.disconnect();
+  //   };
+  // },[])
+
   function selectUser(userId) {
     const chat = chats.find((chat) => {
       if (chat.isGroup) {
@@ -50,9 +64,11 @@ export default function ChatList() {
       }
       return chat._id === userId;
     });
-    console.log(chat, "chat item");
+  
     dispatch({ type: "UPDATERECIEVER", payload: chat });
   }
+
+  console.log(chats , "chats")
   return (
     <>
       <div className="chatList">
@@ -69,7 +85,7 @@ export default function ChatList() {
         </div>
         <div className="chatList_chats">
           {chats?.map((item) => {
-            console.log("rasen", item);
+  
             if (item.isGroup) {
               return (
                 <ChatItem
