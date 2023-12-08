@@ -169,3 +169,16 @@ async function getGroupMessages(user, payload) {
   return Promise.resolve(messages);
   return Promise.resolve(messages);
 }
+
+let counter = 0;
+
+function chatSocket(io){
+   
+  // io.on("connection",()=>{
+  //   console.log("socket connected");
+  //   console.log(counter);
+  //   counter ++;
+  // })
+}
+
+exports.chatSSocket = chatSocket;

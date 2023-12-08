@@ -50,7 +50,7 @@ async function signIn(req, res) {
   const user = await userModel.find({ email });
   if (user && user[0] && user[0].email === email) {
     bcrypt.compare(password, user[0].password, (err, result) => {
-      if (err) {
+        if (err) {
         return res.status(500).json({ message: "internal server error" });
       }
       const token = generateToken(user);
