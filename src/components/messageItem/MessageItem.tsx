@@ -7,22 +7,34 @@ type messageItemProps = {
   other?: boolean;
   time?: string;
   image?: string;
-  Name?:string;
+  Name?:string | undefined;
+  type?:string 
+  fileSrc?:string
 };
 
 export default function Messageitem(props: messageItemProps) {
+
+  const [vidClicked , setVidClicked] = React.useState(false);
+  function handleVidClick(){
+    setVidClicked(true);
+  }
+
   return (
     <>
-      <div className={`message_item ${props.other ? "other" : "me"}`}>
+      <div className={`message_item ${props.other ? "other" : "me"}` }>
         <div className={`message_content ${props.other ? "other" : "me"}`}>
-          {/* <div className="message_image">
+          <div className="message_image_Avatar">
           <Avatar src="https://images.unsplash.com/photo-1503023345310-bd7c1de61c7d?q=80&w=1530&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" />
-          <img
-              src="https://images.unsplash.com/photo-1503023345310-bd7c1de61c7d?q=80&w=1530&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-              alt=""
-            />
-          </div> */}
-          <div className="message_div">
+          </div>
+         {props.type =="image"  && <div className="message_image">
+           <img
+               src={props?.image}
+               alt="image"
+               loading="lazy"
+             />
+          </div>
+            }
+         {  props.message && <div className="message_div">
             <div
               className={`message_item_Name ${props.other ? "other" : "me"}`}
             >
@@ -34,9 +46,23 @@ export default function Messageitem(props: messageItemProps) {
                 {props.message}
               </div>
             </div>
-          </div>
+          </div>}
+        
+          {props.type === "video" &&    <div  className="wrapper">
+
+              <video preload="none" controls={vidClicked ? true : false} onClick={handleVidClick} style={{cursor:"pointer"}} width={200} height={200} src={props.fileSrc}>
+                controlls
+              </video>
+              <div className="content">
+           { !vidClicked && <div onClick={handleVidClick} className="play">►</div>}
+            
+        </div>
+            
+            </div>}
         </div>
       </div>
     </>
   );
 }
+
+

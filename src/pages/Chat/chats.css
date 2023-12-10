@@ -35,3 +35,10 @@
 .main_chat_panel {
   width: 67%;
 }
+
+.left_nav_icons{
+  cursor: pointer;
+}
+.userDetails_values{
+  color: rgb(55, 55, 55);
+}

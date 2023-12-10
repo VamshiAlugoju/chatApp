@@ -1,14 +1,23 @@
 import styles from "./chats.module.css";
+import React , {useEffect} from "react";
 import "./chats.css";
 import ChatList from "../../components/ChatsList/ChatList";
 import ChatPanel from "../../components/ChatPanel/ChatPanel";
 import ExitToAppIcon from "@mui/icons-material/ExitToApp";
 import { Tooltip } from "react-tooltip";
+import { Modal } from "@mui/material";
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import { localUrl } from "../../helper/Baseurls";
+import Header from "../../helper/constants";
+import axios from "axios";
+import ClipLoader from "react-spinners/ClipLoader";
 
 type ChatProps = {
   logOutUser: () => void;
 };
 export default function Chat(props: ChatProps) {
+
+  const [showUserDetails , setShowUserDetails] = React.useState(false);
   return (
     <>
       <div className="homePage">
@@ -33,7 +42,17 @@ export default function Chat(props: ChatProps) {
               </svg>
             </div>
             <div
-              className="logOut_div"
+             className="left_nav_icons"
+             style={{ textAlign: "center", marginTop: "1rem" }}
+            >
+              <AccountCircleIcon onClick={()=>{
+                setShowUserDetails(true)
+              }}  data-tooltip-id="user_toolTip"
+                  data-tooltip-content="About" sx={{ color: "#e91e63", fontSize: 40 }} />
+              <Tooltip id="user_toolTip" />
+            </div>
+            <div
+              className="logOut_div left_nav_icons"
               style={{ textAlign: "center", marginTop: "1rem" }}
               onClick={props.logOutUser}
             >
@@ -46,6 +65,7 @@ export default function Chat(props: ChatProps) {
               </span>
               <Tooltip id="logout_tooltip" />
             </div>
+           
           </div>
           <div className="chatList_main">
             <ChatList />
@@ -54,7 +74,73 @@ export default function Chat(props: ChatProps) {
             <ChatPanel />
           </div>
         </div>
+       { showUserDetails && <UserDetails showModal={showUserDetails} setShowModal = {setShowUserDetails} />}
       </div>
     </>
   );
+}
+const style = {
+  // eslint-disable-next-line @typescript-eslint/prefer-as-const
+  position: "absolute" as "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  width: 450,
+  backgroundColor: "white",
+  boxShadow: "24",
+  borderRadius:"5px",
+  pt: 2,
+  px: 4,
+  pb: 3,
+};
+function UserDetails(props):JSX.Element{
+   
+  console.log("called")
+  const [userData,setUserData] = React.useState<any>(null);
+  const [loading,setLoading] = React.useState(true);
+  const centerStyle = {
+    display:"flex",
+    justifyContent:"center"
+  }
+     useEffect(()=>{
+      const  url = localUrl+"/user/getUserDetails/";
+      const headers = Header();
+      axios.get(url,headers).then((result)=>{
+          setUserData(result.data.data);
+          setLoading(false);
+      }).catch(err=>{
+        console.log(err.message);
+        setLoading(false);
+      })
+     },[])
+      
+  return(
+    <>
+    <Modal open={props.showModal} onClose={()=>{
+      props.setShowModal(false)
+    }} >
+        <div style={style}>
+        <h1 style={{textAlign:"center",borderBottom:"1px solid black", paddingBottom:"0.5rem"}}>
+          About
+        </h1>
+      {loading ? <div style={{display:"flex" , justifyContent:"center", paddingBottom:"1rem"}}>
+
+        <ClipLoader />
+      </div>
+       : 
+        <div>
+        <div className="chatPanelPeople_image_div" style={centerStyle}>
+      <img src="https://images.unsplash.com/photo-1503023345310-bd7c1de61c7d?q=80&w=1530&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="" />
+    </div>
+    <div style={{...centerStyle,flexDirection:"column",alignItems:"flex-start" }}>
+       <h2 style={{marginLeft:"1rem"}}>Name : <span className="userDetails_values"> {userData?.name}</span></h2>
+      <h2 style={{marginLeft:"1rem"}}>Email : <span className="userDetails_values">{userData?.email}</span></h2>
+      <h2 style={{marginLeft:"1rem"}}>About : <span className="userDetails_values">{userData?.bio}</span></h2>
+    </div>
+        </div>}
+      </div>
+     
+    </Modal>
+    </>
+  )
 }

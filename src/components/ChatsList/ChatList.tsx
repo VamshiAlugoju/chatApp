@@ -9,6 +9,7 @@ import AllUsersModal from "../models/AllUsersModal";
 import CreateGroupModal from "../models/CreateGroupModal";
 import { useSelector } from "react-redux/es/hooks/useSelector";
 import { useDispatch } from "react-redux";
+import { Tooltip } from "react-tooltip";
 
 export default function ChatList() {
   const dispatch = useDispatch();
@@ -46,16 +47,6 @@ export default function ChatList() {
     setchats(updatedChatsData);
   }, [user.chatList]);
 
-  // useEffect(()=>{
-  //   socket = io("http://localhost:8080",{
-  //     reconnection: true,           // Enable reconnection
-  //     reconnectionAttempts: 3, 
-  //   });
-  //   return () => {
-  //     // Clean up the socket connection when the component is unmounted
-  //     socket.disconnect();
-  //   };
-  // },[])
 
   function selectUser(userId) {
     const chat = chats.find((chat) => {
@@ -78,9 +69,12 @@ export default function ChatList() {
             onClick={() => {
               setSendOptions((prev) => !prev);
             }}
+            data-tooltip-id="chat_options"
+            data-tooltip-content="Add Chat"
           >
             <AddIcon />
           </button>
+          <Tooltip  id="chat_options" />
           {showSendOptions && <OptionsPanel setSendOptions={setSendOptions} />}
         </div>
         <div className="chatList_chats">

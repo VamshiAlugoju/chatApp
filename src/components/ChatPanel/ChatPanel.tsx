@@ -1,4 +1,4 @@
-import React, { JSXElementConstructor, useEffect } from "react";
+import React, {  useDebugValue, useEffect } from "react";
 import "./chatpanel.css";
 import { Avatar } from "@mui/material";
 import SendText from "./SendText";
@@ -12,6 +12,8 @@ import axios from "axios";
 import AddIcon from "@mui/icons-material/Add";
 import { Tooltip } from "react-tooltip";
 import io from "socket.io-client";
+import BeatLoder from "react-spinners/BeatLoader"
+import ClipLoader from "react-spinners/ClipLoader"
 
 import AddPeopleModal from "../models/AddPeopleModal";
 type ChatPanelProps = {
@@ -35,36 +37,65 @@ export default function ChatPanel(props: ChatPanelProps) {
   const isAdmin = groupDetails?.Admins.find((item: any) => {
     return item._id === user._id;
   });
+  const [showUpload , setShowUpload] = React.useState(false);
+  const [uploadingFile , setUploadingFile] = React.useState(false);
   function toggleProfile() {
     setshowProfile((prev) => !prev);
     setShowMessages((prev) => !prev);
   }
-  async function sendMessage(message) {
+  function toggleUpload(){
+    setShowUpload(prev=>!prev);
+  }
+  async function sendMessage(message, filesArr) {
+    
+    const formData = new FormData();
+    const messageData : any = {
+      other: false,
+      date: Date.now().toLocaleString(),
+    };
+    if(!message && filesArr){
+      formData.append('file', filesArr[0]?.file);
+    }
     const payload = {
       message: message,
       time: Date.now().toLocaleString(),
       rec: receiver,
     };
-    const messageData = {
-      other: false,
-      content: message,
-      date: Date.now().toLocaleString(),
-    };
-    // send message ;
-
+    
+    formData.append("time", payload.time);
+    formData.append("rec", JSON.stringify( payload.rec));
+if (message) {
+  formData.append("message", payload.message);
+  messageData.content = message;
+}
+  
     const url = localUrl + "/chat/sendMessage";
     const headers = Header();
-    let result = await axios.post(url, payload, headers);
+    let result = await axios.post(url, formData, headers);
+    if(filesArr && filesArr.length!== 0 && message === null){
+         console.log(result , "summa");
+         messageData.type = result.data?.data?.type;
+         messageData.fileSrc = result?.data?.data?.fileSrc;
+    }
     setMessageData((prev) => {
       return [...prev, messageData];
     });
     socket.emit("send message",{...messageData,other:true ,id:receiver._id});
   }
 
+  async function uploadFiles(arrOfFiles){
+       setUploadingFile(true);
+       console.log(arrOfFiles , "files");
+      await sendMessage( null , arrOfFiles);
+       setUploadingFile(false)
+  }
+
   useEffect(() => {
     (async () => {
 
       if (Object.keys(receiver).length !== 0) {
+        setshowProfile(false) 
+        setShowMessages(true);
         setIsChatSelected(true);
         setShowLoader(true);
         const data = await loadChats(
@@ -84,7 +115,9 @@ export default function ChatPanel(props: ChatPanelProps) {
       }
     })();
   }, [receiver]);
-
+   useEffect(()=>{
+    console.log( ",,,,,,,,,,,....>>>.", messageData)
+   },[messageData])
   useEffect(()=>{
     socket = io.connect("http://localhost:8080");
     socket.emit("setup",user)
@@ -92,7 +125,7 @@ export default function ChatPanel(props: ChatPanelProps) {
         console.log("connected");
     })
     socket.on("recieve message",(data)=>{
-        
+          console.log("recived messaage" , data)
           setMessageData((prev) => {
             return [...prev, data];
           });
@@ -104,7 +137,10 @@ export default function ChatPanel(props: ChatPanelProps) {
   if (!isChatSelected) {
     return (
       <div className="chatPanel">
-        <div>selelct a chat to message</div>
+        <div style={{display:"flex" , justifyContent:"center", alignItems:"center", height:"100%" ,flexDirection:"column"}}>
+          <h1>Select A Chat To Message</h1>
+          <h1> Or Click On Add Chat</h1>
+        </div>
       </div>
     );
   }
@@ -121,7 +157,7 @@ export default function ChatPanel(props: ChatPanelProps) {
                 {" "}
                 {receiver.isGroup ? receiver.gname : receiver.name}{" "}
               </p>
-              <p className="  "> online</p>
+              <p className="  ">Not Online</p>
             </div>
           </div>
           {groupDetails && isAdmin && (
@@ -141,10 +177,10 @@ export default function ChatPanel(props: ChatPanelProps) {
           )}
         </div>
         {showMessages && chatPanelChats(messageData, user)}
-        {showProfile && chatPanelProfile()}
+        {showProfile && <ChatPanelProfile id={receiver._id} isGroup={receiver.isGroup} />}
         {showMessages && (
           <div className="chatPanel_send">
-            <SendText sendMessage={sendMessage} />
+            {uploadingFile ? <div style={{width:"100%" , display:"flex", justifyContent:"center"}}><BeatLoder loading={uploadingFile} color="#36d7b7" /></div> : <SendText uploadFiles={uploadFiles} toggleUpload={toggleUpload} sendMessage={sendMessage} />}
           </div>
         )}
         {showAddPeople && receiver.isGroup && (
@@ -170,16 +206,17 @@ function chatPanelChats(messagesData: any, user: any) {
           if (item?.sender?._id === user._id) {
             isOther = false;
           } else if (item.other !== undefined) {
-          
             isOther = item.other;
           }
           return (
             <Messageitem
+              type={item.type}
               message={item.content}
               other={isOther}
               time={item.date}
-              image={item.image}
+              image={item?.fileSrc}
               Name={item?.sender?.name}
+              fileSrc={item?.fileSrc}
             />
           );
         })}
@@ -189,8 +226,41 @@ function chatPanelChats(messagesData: any, user: any) {
   );
 }
 
-function chatPanelProfile() {
-  return <div  className="chatPanel_chat"></div>;
+function ChatPanelProfile(props) : Jsx.Element {
+  const [userData,setUserData] = React.useState<any>(null);
+  const [loading,setLoading] = React.useState(true);
+  const centerStyle = {
+    display:"flex",
+    justifyContent:"center"
+  }
+     useEffect(()=>{
+      let url = localUrl+"/user/getUserDetails/"+props.id;
+      const headers = Header();
+      axios.get(url,headers).then((result)=>{
+          setUserData(result.data.data);
+          setLoading(false);
+      }).catch(err=>{
+        console.log(err.message);
+        setLoading(false);
+      })
+     },[])
+      
+  return <div  className="chatPanel_chat">
+    {loading ? <div>
+<ClipLoader />
+    </div> : <></> }
+    <div style={{textAlign:"center"}}>
+      <h1>userDetails</h1>
+    </div>
+    <div className="chatPanelPeople_image_div" style={centerStyle}>
+      <img src="https://images.unsplash.com/photo-1503023345310-bd7c1de61c7d?q=80&w=1530&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="" />
+    </div>
+    <div style={{...centerStyle,flexDirection:"column",alignItems:"flex-start" }}>
+       <h2 style={{marginLeft:"1rem"}}>Name : <span>{userData?.name}</span></h2>
+      <h2 style={{marginLeft:"1rem"}}>Email : <span>{userData?.email}</span></h2>
+      <h2 style={{marginLeft:"1rem"}}>About : <span>{userData?.bio}</span></h2>
+    </div>
+  </div>;
 }
 
 async function loadChats(recId: string, recName: string, isGroup: any) {

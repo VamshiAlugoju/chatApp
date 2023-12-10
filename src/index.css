@@ -20,3 +20,6 @@ body {
   padding: 0;
   font-family: "Comic Neue", cursive;
 }
+/* *{
+  outline: 1px solid #f00 !important;
+} */
