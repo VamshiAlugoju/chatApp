@@ -13,14 +13,18 @@ import { useDispatch } from "react-redux";
 function App() {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user);
+
   let loggedin = false;
   const token = localStorage.getItem("token");
   if (token !== undefined && token !== null) {
     loggedin = true;
   }
+  
+
   const [isLoggedIn, setisLoggedIn] = useState(loggedin);
   const [loading , setLoading] = useState(true);
   const [userdata,setUserdata] = useState(null);
+  const [reload,setreload] = useState(1);
   async function loginUser() {
     setisLoggedIn(true);
   }
@@ -30,6 +34,9 @@ function App() {
     setisLoggedIn(false);
   }
 
+
+
+  
   useEffect(() => {
     (async () => {
       if (isLoggedIn) {

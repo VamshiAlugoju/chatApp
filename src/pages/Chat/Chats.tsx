@@ -130,7 +130,7 @@ function UserDetails(props):JSX.Element{
        : 
         <div>
         <div className="chatPanelPeople_image_div" style={centerStyle}>
-      <img src="https://images.unsplash.com/photo-1503023345310-bd7c1de61c7d?q=80&w=1530&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="" />
+      <img src={userData.imgSrc ? userData.imgSrc : "https://picsum.photos/300"} alt="" />
     </div>
     <div style={{...centerStyle,flexDirection:"column",alignItems:"flex-start" }}>
        <h2 style={{marginLeft:"1rem"}}>Name : <span className="userDetails_values"> {userData?.name}</span></h2>

@@ -9,7 +9,8 @@ type messageItemProps = {
   image?: string;
   Name?:string | undefined;
   type?:string 
-  fileSrc?:string
+  fileSrc?:string;
+  profileSrc?:string;
 };
 
 export default function Messageitem(props: messageItemProps) {
@@ -24,7 +25,7 @@ export default function Messageitem(props: messageItemProps) {
       <div className={`message_item ${props.other ? "other" : "me"}` }>
         <div className={`message_content ${props.other ? "other" : "me"}`}>
           <div className="message_image_Avatar">
-          <Avatar src="https://images.unsplash.com/photo-1503023345310-bd7c1de61c7d?q=80&w=1530&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" />
+          <Avatar src={props.profileSrc} />
           </div>
          {props.type =="image"  && <div className="message_image">
            <img

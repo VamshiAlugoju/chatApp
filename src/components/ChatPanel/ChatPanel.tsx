@@ -1,6 +1,6 @@
 import React, {  useDebugValue, useEffect } from "react";
 import "./chatpanel.css";
-import { Avatar } from "@mui/material";
+import { Avatar, Button } from "@mui/material";
 import SendText from "./SendText";
 import Messageitem from "../messageItem/MessageItem";
 import ScrollableFeed from "react-scrollable-feed";
@@ -14,11 +14,48 @@ import { Tooltip } from "react-tooltip";
 import io from "socket.io-client";
 import BeatLoder from "react-spinners/BeatLoader"
 import ClipLoader from "react-spinners/ClipLoader"
+import DeleteIcon from '@mui/icons-material/Delete';
+import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 
 import AddPeopleModal from "../models/AddPeopleModal";
+import AdminPanelSettings from "@mui/icons-material/AdminPanelSettings";
 type ChatPanelProps = {
   chatId?: string;
 };
+
+function stringToColor(string: string) {
+  let hash = 0;
+  let i;
+
+  /* eslint-disable no-bitwise */
+  for (i = 0; i < string.length; i += 1) {
+    hash = string.charCodeAt(i) + ((hash << 5) - hash);
+  }
+
+  let color = "#";
+
+  for (i = 0; i < 3; i += 1) {
+    const value = (hash >> (i * 8)) & 0xff;
+    color += `00${value.toString(16)}`.slice(-2);
+  }
+  /* eslint-enable no-bitwise */
+
+  return color;
+}
+
+function stringAvatar(name: string) {
+  if(name){
+    return {
+      sx: {
+        bgcolor: stringToColor(name),
+      },
+      children: `${name.split(" ")[0][0]}`,
+    };
+  }
+  return {}
+}
+
+
 
 let socket ;
 export default function ChatPanel(props: ChatPanelProps) {
@@ -73,10 +110,12 @@ if (message) {
     const headers = Header();
     let result = await axios.post(url, formData, headers);
     if(filesArr && filesArr.length!== 0 && message === null){
-         console.log(result , "summa");
-         messageData.type = result.data?.data?.type;
-         messageData.fileSrc = result?.data?.data?.fileSrc;
+      messageData.type = result.data?.data?.type;
+      messageData.fileSrc = result?.data?.data?.fileSrc;
     }
+    console.log(result.data?.data?.sender?.imgSrc , "summa");
+    messageData.sender = {}
+    messageData.sender.imgSrc = result.data?.data?.sender?.imgSrc;
     setMessageData((prev) => {
       return [...prev, messageData];
     });
@@ -150,7 +189,7 @@ if (message) {
         <div className="chatPanel_nav">
           <div className="chatPanel_user">
             <span onClick={toggleProfile}>
-              <Avatar />
+             { receiver?.isGroup ? <Avatar {...stringAvatar(receiver.gname)} /> : <Avatar src={receiver?.imgSrc} />}
             </span>
             <div className="ch_nav_details">
               <p className="ch_nav_name">
@@ -177,7 +216,7 @@ if (message) {
           )}
         </div>
         {showMessages && chatPanelChats(messageData, user)}
-        {showProfile && <ChatPanelProfile id={receiver._id} isGroup={receiver.isGroup} />}
+        {showProfile && <ChatPanelProfile receiver={receiver} id={receiver._id} isGroup={receiver.isGroup} />}
         {showMessages && (
           <div className="chatPanel_send">
             {uploadingFile ? <div style={{width:"100%" , display:"flex", justifyContent:"center"}}><BeatLoder loading={uploadingFile} color="#36d7b7" /></div> : <SendText uploadFiles={uploadFiles} toggleUpload={toggleUpload} sendMessage={sendMessage} />}
@@ -210,6 +249,7 @@ function chatPanelChats(messagesData: any, user: any) {
           }
           return (
             <Messageitem
+              profileSrc={item?.sender?.imgSrc}
               type={item.type}
               message={item.content}
               other={isOther}
@@ -229,37 +269,103 @@ function chatPanelChats(messagesData: any, user: any) {
 function ChatPanelProfile(props) : Jsx.Element {
   const [userData,setUserData] = React.useState<any>(null);
   const [loading,setLoading] = React.useState(true);
+  const [groupData,setGroupData] = React.useState<any>(null)
+  
   const centerStyle = {
     display:"flex",
     justifyContent:"center"
   }
-     useEffect(()=>{
-      let url = localUrl+"/user/getUserDetails/"+props.id;
+
+
+  async function removeUserFromGroup(id,groupId){
+    try{
+      setLoading(true);
+      let url = localUrl+"/group/removeUsers";
       const headers = Header();
-      axios.get(url,headers).then((result)=>{
-          setUserData(result.data.data);
-          setLoading(false);
-      }).catch(err=>{
-        console.log(err.message);
-        setLoading(false);
-      })
+      const result = await axios.post(url,{_id:id,groupId:groupId},headers);
+      const data = await getGroupDetails(props.receiver?.groupId);
+      setGroupData(data);
+      setLoading(false);
+    }
+    catch(err){
+      setLoading(false);
+    }
+  }
+
+  async function makeUserAdmin(id,groupId){
+    try{
+      setLoading(true);
+      let url = localUrl+"/group/addAdmin";
+      const headers = Header();
+      const result = await axios.post(url,{_id:id,groupId:groupId},headers);
+      const data = await getGroupDetails(props.receiver?.groupId);
+      setGroupData(data);
+      setLoading(false);
+    }
+    catch(err){
+      setLoading(false);
+    }
+  }
+     useEffect(()=>{
+        (async()=>{
+
+          try{
+            let url = localUrl+"/user/getUserDetails/"+props.id;
+            const headers = Header();
+            let result;
+             if(props?.receiver?.isGroup){ 
+              result = await getGroupDetails(props.receiver?.groupId);
+              setGroupData(result)
+              setLoading(false);
+             }
+             else{
+               result = await axios.get(url,headers);
+               setUserData(result.data.data);
+               setLoading(false);
+             }
+          }
+          catch(err){
+            setLoading(false);
+          }
+        })()
+
      },[])
+
+     useEffect(()=>{
+     
+      console.log("group data" , groupData)
+
+     ,[groupData]})
       
   return <div  className="chatPanel_chat">
-    {loading ? <div>
+    {loading ? <div style={{...centerStyle,height:"100%" ,alignItems:"center"}}>
 <ClipLoader />
-    </div> : <></> }
+    </div> : <>
     <div style={{textAlign:"center"}}>
       <h1>userDetails</h1>
     </div>
     <div className="chatPanelPeople_image_div" style={centerStyle}>
-      <img src="https://images.unsplash.com/photo-1503023345310-bd7c1de61c7d?q=80&w=1530&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="" />
+    { props.receiver.isGroup ? <img src="https://picsum.photos/300?grayscale"/> :   <img src={userData?.imgSrc} alt="" />}
     </div>
-    <div style={{...centerStyle,flexDirection:"column",alignItems:"flex-start" }}>
+    
+  { props?.receiver?.isGroup ?  <div style={{...centerStyle,flexDirection:"column",alignItems:"flex-start" }}>
+     <h2 style={{marginLeft:"1rem"}}>Group Name : <span>{groupData?.Name}</span></h2>
+      <h2 style={{marginLeft:"1rem"}}>About : <span>{groupData?.About}</span></h2>
+      <div className="group_memebers_div">
+      <h2 style={{marginLeft:"1rem"}}>Members : </h2>
+       <div style={{marginLeft:"1rem"}}>
+        {groupData?.members?.map(item=>{
+          return <GroupItem makeUserAdmin={makeUserAdmin} removeUserFromGroup={removeUserFromGroup} user={item} groupData={groupData} />
+        })}
+       </div>
+      </div>
+     </div> : <div style={{...centerStyle,flexDirection:"column",alignItems:"flex-start" }}>
        <h2 style={{marginLeft:"1rem"}}>Name : <span>{userData?.name}</span></h2>
       <h2 style={{marginLeft:"1rem"}}>Email : <span>{userData?.email}</span></h2>
       <h2 style={{marginLeft:"1rem"}}>About : <span>{userData?.bio}</span></h2>
-    </div>
+    </div>}
+    </> }
+ 
   </div>;
 }
 
@@ -282,4 +388,52 @@ async function getGroupDetails(groupId: any) {
   const headers = Header();
   const result = await axios.get(url, headers);
   return result.data.data;
+}
+ 
+function GroupItem(props):JSX.Element{
+    const user = props.user;
+    const groupData = props.groupData;
+    function deleteUser(){
+      props.removeUserFromGroup(user._id , groupData._id)
+    }
+    function makeAdmin(){
+      props.makeUserAdmin(user._id,groupData._id)
+    }
+    const isAdmin = groupData.Admins.find((useritem:any)=>user._id === useritem._id);
+
+  return (
+    <>
+      <div className="GroupItem">
+        <Avatar />
+        <h2 
+         data-tooltip-content={user?.name}
+         data-tooltip-id="groupItem_userName"
+        >{user?.name.slice(0,10)}</h2>
+       {isAdmin ? <Button
+        data-tooltip-content={`Admin`}
+        data-tooltip-id="groupItem_admin"
+        >
+          <AdminPanelSettings color="success" />
+        </Button>
+        :
+        <Button
+        data-tooltip-content={`Make ${user?.name} Admin`}
+        data-tooltip-id="groupItem_admin"
+        onClick={makeAdmin}
+        >
+          <AdminPanelSettings />
+        </Button>}
+        <Button
+         data-tooltip-content={`Remove ${user?.name} from group`}
+         data-tooltip-id="groupItem_remove"
+         onClick={deleteUser}
+        >
+          <DeleteIcon color="error" />
+        </Button>
+      </div>
+      <Tooltip id={"groupItem_userName"} />
+      <Tooltip id={"groupItem_admin"} />
+      <Tooltip id={"groupItem_remove"} />
+    </>
+  )
 }

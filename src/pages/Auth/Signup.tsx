@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React from "react";
+import React, { ChangeEvent } from "react";
 import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -15,6 +15,7 @@ import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import axios from "axios";
 import { localUrl } from "../../helper/Baseurls";
+import { Input } from '@mui/material';
 // import dotenv from "dotenv";
 // // dotenv.config();
 
@@ -46,17 +47,20 @@ export default function SignUp(props: SignUpProps) {
   const [name, setName] = React.useState("");
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
-
+  const [file,setFile] = React.useState<any>(null);
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-
+    if(file == null){
+      return alert("please select an image")
+    }
     const url = localUrl;
     try {
-      const result = await axios.post(url + "/user/signUp", {
-        name,
-        email,
-        password,
-      });
+      const formData = new FormData();
+      formData.append("name",name);
+      formData.append("email",email);
+      formData.append("password",password);
+      formData.append("file",file)
+      const result = await axios.post(url + "/user/signUp",formData);
       if (result && result.status) {
         props.toggleToLogin();
       } else {
@@ -66,6 +70,21 @@ export default function SignUp(props: SignUpProps) {
       console.log(err);
     }
   };
+
+  function handleChange(event:any): void {
+
+    const data = event.target.files;
+     console.log(data[0].type , "data");
+     if(!data[0].type.startsWith("image"))
+     {
+      alert("please select only image files")
+     }else{
+       setFile(data[0]);
+     }
+  }
+
+
+
 
   return (
     <ThemeProvider theme={defaultTheme}>
@@ -135,6 +154,12 @@ export default function SignUp(props: SignUpProps) {
                     setPassword(e.target.value);
                   }}
                 />
+              </Grid>
+              <Grid item xs={12}>
+                <Grid item xs={12}>
+                <label style={{fontSize:"1.3rem"}} htmlFor="">Profile pic :</label>
+                </Grid>
+                <Input onChange={handleChange}  name="fileInput" type="file"/>
               </Grid>
             </Grid>
             <Button
