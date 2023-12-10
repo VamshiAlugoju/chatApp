@@ -15,7 +15,7 @@ require('dotenv').config()
 const upload = multer();
 const io = socketIo(server,{
     cors:{
-        origin:"http://localhost:4173"
+        origin:"*"
     }
 });
 const chatControllers = require("./Controllers/chatControllers");
