@@ -10,9 +10,11 @@ const socketIo = require("socket.io");
 const cors = require("cors")
 const app = express();
 const server = http.createServer(app)
+const multer = require("multer");
+const upload = multer();
 const io = socketIo(server,{
     cors:{
-        origin:"http://localhost:5174"
+        origin:"http://localhost:5173"
     }
 });
 
@@ -23,6 +25,7 @@ const chatControllers = require("./Controllers/chatControllers");
 //   }
 // })
 app.use(bodyParser({ extended: "application/json" }));
+app.use(bodyParser.json());
 app.use(cors({ origin: "*" }));
 const PORT = 8080;
 
@@ -30,7 +33,7 @@ app.use("/api/user", userRoutes);
 app.use("/api/group", groupRoutes);
 app.use("/api/chat/", chatRoutes);
 
-app.use("/test", test.test);
+app.use("/test",upload.single("file") ,test.test);
 
 app.get("/son", (req, res) => {
   res.send("listening nigga");
@@ -48,7 +51,7 @@ io.on('connection', (socket) => {
     console.log("joined in" , id);
   })
   socket.on("send message",(data)=>{
-    console.log(data)
+
     socket.to(data.id).emit('recieve message', data);
   })
 })

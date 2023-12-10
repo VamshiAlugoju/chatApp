@@ -12,7 +12,8 @@ const messageSchema = new schema({
   reciever: {},
   belongsToGroup: Boolean,
   groupId: { type: schema.ObjectId },
+  fileSrc:String
 });
-
+  
 const messageModal = mongoose.model("message", messageSchema);
 module.exports = messageModal;

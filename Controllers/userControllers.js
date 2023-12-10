@@ -70,8 +70,15 @@ async function getAllUsers(req, res) {
   const user = req.user;
   try {
     if (req.user && req.user.email) {
+      const usersToignore = [user.email];
+      user.chatList.forEach(item => {
+          if(!item.isGroup){
+            const otherUser = item.users.find((user)=>user._id !== req.user._id)
+            usersToignore.push(otherUser.email)
+          }
+      });
       const userList = await userModel.find({
-        email: { $nin: [user.email] },
+        email: { $nin: usersToignore},
       });
       return res.json({ status: true, data: userList });
     }

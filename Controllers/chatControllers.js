@@ -2,13 +2,34 @@ const { response } = require("express");
 const chatModal = require("../models/chatdetailmodel");
 const messageModal = require("../models/messageModel");
 const userModal = require("../models/userModel");
+const upload_to_s3= require("../utils/uploadToS3")
+
+
 
 async function sendMessage(req, res) {
+  
   const user = req.user;
   const chatList = user.chatList;
-  const payload = req.body;
+  let payload = req.body;
+
+  if(payload.rec){
+    payload.rec = JSON.parse( payload.rec)
+  }
+  let isFile = false;
+  let fileDetails;
+  if(req.file){
+    try{
+      fileDetails =  await  handleFile(req.file,user);
+      const fileType = req.file.mimetype.split("/")[0]
+      fileDetails.type = fileType;
+      isFile = true;
+    }
+    catch(err){
+      res.status(500).json({message:err.message})
+    }
+  }
   if (payload && payload.rec.isGroup === true) {
-    return sendMessageToGroup(user, chatList, payload)
+    return sendMessageToGroup(user, chatList, payload,isFile,fileDetails)
       .then((response) => {
         return res.status(200).json({ status: true, data: response });
       })
@@ -16,14 +37,21 @@ async function sendMessage(req, res) {
         return res.status(500).json({ error: err });
       });
   }
+  
   let messageData = {
-    content: payload.message,
-    type: "text",
     time: payload.time,
     date: new Date().toString(),
     sender: { ...user },
     belongsToGroup: false,
   };
+  if(isFile){
+    messageData.type = fileDetails.type;
+    messageData.fileSrc = fileDetails.Location;
+  }
+   if(payload.message){
+  messageData.content = payload.message;
+  messageData.type = "text";
+   }
   const chat = user?.chatList?.find((chat) => {
     return chat?.users?.some((user) => {
       return user._id === payload.rec._id;
@@ -120,16 +148,22 @@ async function getMessages(req, res) {
 
 exports.getMessages = getMessages;
 
-async function sendMessageToGroup(user, chatList, payload) {
+async function sendMessageToGroup(user, chatList, payload , isFile,fileDetails) {
   let messageData = {
-    content: payload.message,
-    type: "text",
     time: payload.time,
     date: new Date().toString(),
     sender: { ...user },
     belongsToGroup: true,
     groupId: payload.rec._id,
   };
+  if(isFile){
+    messageData.type = fileDetails.type;
+    messageData.fileSrc = fileDetails.Location;
+  }
+   if(payload.message){
+  messageData.content = payload.message;
+  messageData.type = "text";
+   }
 
   const chat = user?.chatList?.find((chat) => {
     return chat._id === payload.rec._id;
@@ -170,15 +204,17 @@ async function getGroupMessages(user, payload) {
   return Promise.resolve(messages);
 }
 
-let counter = 0;
 
-function chatSocket(io){
-   
-  // io.on("connection",()=>{
-  //   console.log("socket connected");
-  //   console.log(counter);
-  //   counter ++;
-  // })
+
+async function handleFile( fileData , user ){
+  try{
+    const file = fileData;
+    const filename = Date.now() +"_"+ file.originalname;
+      const data = await upload_to_s3(filename , file.buffer);
+     return Promise.resolve(data);
+  }
+  catch(err){
+    return Promise.reject(err)
+  }
+    
 }
-
-exports.chatSSocket = chatSocket;
