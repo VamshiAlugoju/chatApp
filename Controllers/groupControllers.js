@@ -18,6 +18,7 @@ async function createGroup(req, res) {
         Name: gName,
         createDate: Date.now(),
         members: [req.user],
+        About:about
       });
       const objUpdate = {
         isGroup: true,
@@ -135,7 +136,7 @@ async function addAdmins(req, res) {
     userprm = userprm.toObject();
     const groupprm = await groupModel.updateOne(
       { _id: payload.groupId },
-      userprm
+      {$push:{Admins:userprm}}
     );
     return res.status(200).json({ status: true, message: "added to group" });
   } catch (err) {
@@ -153,13 +154,18 @@ async function removeUsers(req, res) {
     const user = req.user;
     const group = await groupModel.find({ _id: payload.groupId });
     const isUserAdmin =
-      group.Admins.find((item) => {
+      group[0].Admins.find((item) => {
         return item._id === user._id;
       }).length !== 0;
-    if (!isAdmin) {
+    if (!isUserAdmin) {
       return res
         .status(204)
         .json({ status: false, message: "you are not a admin" });
+    }
+
+    const isCreator = payload._id === user._id;
+    if(isCreator){
+      res.status(204).json({status:false,message:"couldn't remove creator of group"})
     }
 
     const updateprm = await groupModel.updateOne(

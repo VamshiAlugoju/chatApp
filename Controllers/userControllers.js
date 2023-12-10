@@ -2,6 +2,7 @@
 const userModel = require("../models/userModel");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const upload_to_s3 = require("../utils/uploadToS3")
 
 const generateToken = (user) => {
   const token = jwt.sign({ user }, "secretkey");
@@ -9,39 +10,59 @@ const generateToken = (user) => {
 };
 
 const signUp = async (req, res) => {
-  const { name, email, password } = req.body;
-  if (!name || !email || !password) {
-    return res.status(400).json({
-      status: false,
-      message: "invlaid data check the form once **",
-    });
-  }
 
-  const user = await userModel.find({ email });
-  if (user && user[0]) {
-    return res
-      .status(409)
-      .json({ status: false, message: "user already exists" });
-  }
-
-  bcrypt.hash(password, 10, (err, hash) => {
-    if (err) {
-      console.log(err);
-      return err;
+  try{
+    const { name, email, password } = req.body;
+    const file = req.file
+    
+    
+    if (!name || !email || !password) {
+      return res.status(400).json({
+        status: false,
+        message: "invlaid data check the form once **",
+      });
     }
-    userModel.create({
-      name,
-      email,
-      password: hash,
-      createdDate: Date.now(),
+    let fileDetails;
+    if(file )
+    {
+      if( !file.mimetype?.startsWith("image")){
+        return res.status(400).json({message:"not a image"})
+      }
+      let fileName = Date.now()+"/"+file.originalname;
+      fileDetails = await upload_to_s3(fileName , file.buffer);
+    }
+  
+    const user = await userModel.find({ email });
+    if (user && user[0]) {
+      return res
+        .status(409)
+        .json({ status: false, message: "user already exists" });
+    }
+  
+    bcrypt.hash(password, 10, async (err, hash) => {
+      if (err) {
+        console.log(err);
+         throw new Error("internal error" , err);
+      }
+      await  userModel.create({
+        name,
+        email,
+        password: hash,
+        createdDate: Date.now(),
+        imgSrc : fileDetails.Location
+      });
+      return  res.json({
+        name,
+        email,
+        status: true,
+        message: "Account Created",
+      });
     });
-    res.json({
-      name,
-      email,
-      status: true,
-      message: "Account Created",
-    });
-  });
+  }
+  catch(err){
+    return res.status(500).json({error:err})
+  }
+ 
 };
 exports.signUp = signUp;
 

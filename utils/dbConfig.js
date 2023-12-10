@@ -3,9 +3,9 @@ const mongoose = require("mongoose");
 async function connectDb() {
   try {
     const mongo = await mongoose.connect(
-      "mongodb+srv://VamshiKrishna:Vamshi123@cluster0.vsxibmi.mongodb.net/?retryWrites=true&w=majority",
+      process.env.MONGOURL,
       {
-        dbName: "application",
+        dbName:  process.env.DBNAME,
       }
     );
     console.log("connection successFull", mongo.connection.host);

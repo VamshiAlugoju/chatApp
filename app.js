@@ -11,13 +11,13 @@ const cors = require("cors")
 const app = express();
 const server = http.createServer(app)
 const multer = require("multer");
+require('dotenv').config()
 const upload = multer();
 const io = socketIo(server,{
     cors:{
-        origin:"http://localhost:5173"
+        origin:"http://localhost:4173"
     }
 });
-
 const chatControllers = require("./Controllers/chatControllers");
 // const io = new Sserver(server,{
 //   cors:{

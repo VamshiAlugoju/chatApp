@@ -7,6 +7,7 @@ const groupSchema = new schema({
   Name: String,
   createDate: Date,
   members: [],
+  About:String
 });
 
 const groupModel = mongoose.model("group", groupSchema);

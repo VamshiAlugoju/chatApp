@@ -3,8 +3,8 @@ const aws = require("aws-sdk");
 const upload_to_s3 =(filename,body)=>{
 
     const s3bucket = new aws.S3({
-        accessKeyId:"AKIAXFJXVS47U3VGDGOI",
-        secretAccessKey:"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"
+        accessKeyId:process.env.ACCESSKEY,
+        secretAccessKey:process.env.SECRETACCESSKEY
     });
 
     const params = {
