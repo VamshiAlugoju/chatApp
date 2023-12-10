@@ -1,1 +1,1 @@
-export const localUrl = "http://localhost:8080/api";
+export const localUrl = "https://chat-app-backend-bfxs.onrender.com/api";
