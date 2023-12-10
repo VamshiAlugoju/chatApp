@@ -16,6 +16,8 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import axios from "axios";
 import { localUrl } from "../../helper/Baseurls";
 import { Input } from '@mui/material';
+import ClipLoader from "react-spinners/ClipLoader"
+
 // import dotenv from "dotenv";
 // // dotenv.config();
 
@@ -48,11 +50,13 @@ export default function SignUp(props: SignUpProps) {
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [file,setFile] = React.useState<any>(null);
+  const [signingIn,setSigningIn] = React.useState(false);
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if(file == null){
       return alert("please select an image")
     }
+    setSigningIn(true);
     const url = localUrl;
     try {
       const formData = new FormData();
@@ -66,8 +70,10 @@ export default function SignUp(props: SignUpProps) {
       } else {
         alert(result.data.message);
       }
+      setSigningIn(false);
     } catch (err) {
       console.log(err);
+      setSigningIn(false);
     }
   };
 
@@ -168,7 +174,7 @@ export default function SignUp(props: SignUpProps) {
               variant="contained"
               sx={{ mt: 3, mb: 2, bgcolor: "#4897bd" }}
             >
-              Sign Up
+              {signingIn ? <span><ClipLoader size={23} color="white" /></span> : "Sign Up"}
             </Button>
             <Grid container justifyContent="flex-end">
               <Grid item>

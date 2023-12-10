@@ -14,6 +14,7 @@ import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import axios from "axios";
 import { localUrl } from "../../helper/Baseurls";
+import ClipLoader from "react-spinners/ClipLoader"
 
 type SignInProps = {
   toggleToSignUp: () => void;
@@ -44,12 +45,13 @@ const defaultTheme = createTheme();
 export default function SignIn(props: SignInProps) {
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
+  const [signingIn,setSigningIn] = React.useState(false);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     // const data = new FormData(event.currentTarget);
     const url = localUrl;
-
+    setSigningIn(true);
     try {
       const result = await axios.post(url + "/user/signIn", {
         email,
@@ -62,8 +64,10 @@ export default function SignIn(props: SignInProps) {
       } else {
         alert(result.data.message);
       }
+      setSigningIn(false);
     } catch (err) {
       console.log(err);
+      setSigningIn(false);
     }
   };
 
@@ -125,7 +129,7 @@ export default function SignIn(props: SignInProps) {
               variant="contained"
               sx={{ mt: 3, mb: 2, bgcolor: "#4897bd" }}
             >
-              Sign In
+             {signingIn ? <span><ClipLoader  size={23} color="white"/></span> : "Sign In"}
             </Button>
             <Grid container>
               <Grid item xs>
